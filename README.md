@@ -9,16 +9,10 @@ How
       <artifactId>player-core</artifactId>
       <version>0.1</version>
     </dependency>
-
-  
-  
-public static void main(String[] args) {
-
-    final Player player = PlayerFactory.getPlayer("omxplayer");
     
-    // final Player player = PlayerFactory.getPlayer("mplayer");
-    
-    final String url = "http://somedomain.eu/video.mp4";
-    
-    player.play(url);
-}
+    public static void main(String[] args) {
+        final Player player = PlayerFactory.getPlayer("omxplayer");
+        // final Player player = PlayerFactory.getPlayer("mplayer");
+        final String url = "http://somedomain.eu/video.mp4";
+        player.play(url);
+    }
