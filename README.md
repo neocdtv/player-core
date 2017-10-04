@@ -13,8 +13,12 @@ How
   
   
 public static void main(String[] args) {
+
     final Player player = PlayerFactory.getPlayer("omxplayer");
+    
     // final Player player = PlayerFactory.getPlayer("mplayer");
+    
     final String url = "http://somedomain.eu/video.mp4";
+    
     player.play(url);
 }
