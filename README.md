@@ -12,6 +12,14 @@ Maven
       <version>0.1</version>
     </dependency>
     
+Ubuntu/Debian
+======
+    # you always need to install
+    sudo apt-get install mplayer
+    
+    # omxplayer on raspberry pi 
+    sudo apt-get install omxplayer
+
 Java
 ======
     public static void main(String[] args) {
