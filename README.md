@@ -10,4 +10,8 @@ How
       <version>0.1</version>
     </dependency>
 
-final Player omxplayer = PlayerFactory.create("omxplayer");
+  
+  
+public static void main(String[] args) {
+    final Player omxplayer = PlayerFactory.create("omxplayer");
+}
