@@ -9,3 +9,5 @@ How
       <artifactId>player-core</artifactId>
       <version>0.1</version>
     </dependency>
+
+final Player omxplayer = PlayerFactory.create("omxplayer");
