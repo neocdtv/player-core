@@ -14,7 +14,8 @@ Maven
     
 Ubuntu/Debian
 ======
-    # you always need to install
+    # you always need to install mplayer, even if you want to use omxplayer
+    # the mplayer is used to get info about the multimedia file i.e. duration
     sudo apt-get install mplayer
     
     # omxplayer on raspberry pi 
