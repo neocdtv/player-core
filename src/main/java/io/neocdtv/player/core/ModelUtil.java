@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Shared trivial procedures.
  *
- * @author Christian Bauer
+ * @author Christian Bauer from cling
  */
 public class ModelUtil {
 

@@ -1,5 +1,8 @@
 package io.neocdtv.player.core;
 
+/**
+ * @author xix
+ */
 public class PlayerState {
   private String currentUri;
   private String position;

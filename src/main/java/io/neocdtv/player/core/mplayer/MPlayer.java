@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * @author xix
+ */
 public class MPlayer implements Player {
 
   private final static Logger LOGGER = Logger.getLogger(MPlayer.class.getName());
@@ -23,10 +26,10 @@ public class MPlayer implements Player {
   private PlayerState playerState;
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
-  public static final String OPTION_MEDIA_INFO = "-identify";
-  public static final String OPTION_NO_VIDEO = "-novideo";
-  public static final String OPTION_NO_AUDIO = "-ao null"; // does it work
-  public static final String OPTION_START_POSITION = "-ss";
+  private static final String OPTION_MEDIA_INFO = "-identify";
+  private static final String OPTION_NO_VIDEO = "-novideo";
+  private static final String OPTION_NO_AUDIO = "-ao null"; // does it work
+  private static final String OPTION_START_POSITION = "-ss";
   private final static List<String> CMD = Arrays.asList(
       "mplayer",
       OPTION_MEDIA_INFO,

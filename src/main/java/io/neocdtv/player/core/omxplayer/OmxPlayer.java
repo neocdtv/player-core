@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * @author xix
+ */
 public class OmxPlayer implements Player {
 
   private final static Logger LOGGER = Logger.getLogger(OmxPlayer.class.getName());

@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * @author xix
+ */
 public class MediaInfo {
 
   private static final Logger LOGGER = Logger.getLogger(MediaInfo.class.getName());
