@@ -1,6 +1,6 @@
 What
 =====
-This project offers a Java API to control mplayer and omxplayer. It was tested only on linux. 
+This project offers a Java API to control mplayer and omxplayer. It was tested only on Linux. 
 
 How
 =====
