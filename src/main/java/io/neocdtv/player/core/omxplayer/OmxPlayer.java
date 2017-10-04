@@ -70,10 +70,16 @@ public class OmxPlayer implements Player {
       InputStream outIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
+      /*
+      stdOutConsumer is currently only consuming the output to avoid a deadlock
+       */
       stdOutConsumer = new OmxPlayerErrorStreamConsumer(stdIn, playerState);
       Thread one = new Thread(stdOutConsumer);
       one.start();
 
+      /*
+      errOutConsumer is currently only consuming the output to avoid a deadlock
+       */
       errOutConsumer = new OmxPlayerOutputStreamConsumer(outIn, playerState);
       Thread two = new Thread(errOutConsumer);
       two.start();
