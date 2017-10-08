@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.mplayer;
 
+import io.neocdtv.player.core.EventsHandler;
 import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.Player;
 import io.neocdtv.player.core.PlayerState;
@@ -28,16 +29,18 @@ public class MPlayer implements Player {
   private static final String COMMAND_QUIT = "q";
   private static final String OPTION_MEDIA_INFO = "-identify";
   private static final String OPTION_NO_VIDEO = "-novideo";
-  private static final String OPTION_NO_AUDIO = "-ao null"; // does it work
+  private static final String OPTION_NO_AUDIO = "-ao null";
   private static final String OPTION_START_POSITION = "-ss";
+  private final EventsHandler eventsHandler;
   private final static List<String> CMD = Arrays.asList(
       "mplayer",
       OPTION_MEDIA_INFO,
       OPTION_START_POSITION);
 
-  public MPlayer() {
+  public MPlayer(final EventsHandler eventsHandler) {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
+    this.eventsHandler = eventsHandler;
   }
 
   public void play(final String mediaPath) {
@@ -64,13 +67,10 @@ public class MPlayer implements Player {
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState);
+      stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, eventsHandler);
       Thread one = new Thread(stdOutConsumer);
       one.start();
 
-      /*
-      errOutConsumer is currently only consuming the output to avoid a deadlock
-       */
       errOutConsumer = new MPlayerErrorStreamConsumer(errIn, playerState);
       Thread two = new Thread(errOutConsumer);
       two.start();
@@ -84,6 +84,7 @@ public class MPlayer implements Player {
     LOGGER.log(Level.INFO, "stop");
     if (isProcessAvailable()) {
       stdOutConsumer.deactivate();
+      errOutConsumer.deactivate();
       sendCommand(COMMAND_QUIT);
       try {
         process.waitFor();
@@ -111,11 +112,6 @@ public class MPlayer implements Player {
   public long getDuration() {
     LOGGER.log(Level.INFO, "duration");
     return playerState.getDuration();
-  }
-
-  public float getPositionPercentage() {
-    LOGGER.log(Level.INFO, "position percentage");
-    throw new RuntimeException("NOT IMPLEMENTED");
   }
 
   private void sendCommand(final String command) {

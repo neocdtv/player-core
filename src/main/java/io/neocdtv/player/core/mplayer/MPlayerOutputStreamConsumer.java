@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.mplayer;
 
+import io.neocdtv.player.core.EventsHandler;
 import io.neocdtv.player.core.PlayerState;
 
 import java.io.BufferedReader;
@@ -15,13 +16,21 @@ public class MPlayerOutputStreamConsumer implements Runnable {
 
   private final static Logger LOGGER = Logger.getLogger(MPlayerOutputStreamConsumer.class.getName());
 
+  private final static String EXIT = "ID_EXIT=";
+  private final static String END_OF_FILE = "EOF";
+  private final static String QUIT = "QUIT";
   private final InputStream in;
   private final PlayerState playerState;
+  private final EventsHandler eventsHandler;
   private boolean active = true;
 
-  public MPlayerOutputStreamConsumer(InputStream in, PlayerState playerState) {
+  public MPlayerOutputStreamConsumer(
+      final InputStream in,
+      final PlayerState playerState,
+      final EventsHandler eventsHandler) {
     this.in = in;
     this.playerState = playerState;
+    this.eventsHandler = eventsHandler;
   }
 
   public void run() {
@@ -32,6 +41,7 @@ public class MPlayerOutputStreamConsumer implements Runnable {
       while (active && (line = br.readLine()) != null) {
         LOGGER.info(line);
         handlePosition(line);
+        handleStreamEnded(line);
       }
     } catch (Exception e) {
       LOGGER.info("Exception: " + e.getMessage());
@@ -41,6 +51,12 @@ public class MPlayerOutputStreamConsumer implements Runnable {
       } catch (IOException e) {
         LOGGER.info(e.getMessage());
       }
+    }
+  }
+
+  private void handleStreamEnded(String line) {
+    if (isTrackEndedLine(line)) {
+      eventsHandler.onTrackEnded();
     }
   }
 
@@ -58,5 +74,17 @@ public class MPlayerOutputStreamConsumer implements Runnable {
 
   private boolean isPositionLine(String line) {
     return line.startsWith("A:");
+  }
+
+  private boolean isTrackEndedLine(String line) {
+    if (isExitLine(line)) {
+      final String exitValue = line.trim().substring(EXIT.length());
+      return exitValue.equals(END_OF_FILE);
+    }
+    return false;
+  }
+
+  private static boolean isExitLine(String line) {
+    return line.startsWith(EXIT);
   }
 }

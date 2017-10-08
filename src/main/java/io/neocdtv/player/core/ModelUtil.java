@@ -15,13 +15,6 @@
 
 package io.neocdtv.player.core;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Set;
-
 /**
  * Shared trivial procedures.
  *
