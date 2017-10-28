@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.omxplayer;
 
+import io.neocdtv.player.core.EventsHandler;
 import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.ModelUtil;
 import io.neocdtv.player.core.Player;
@@ -25,6 +26,7 @@ public class OmxPlayer implements Player {
   private OmxPlayerOutputStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
+  private final EventsHandler eventsHandler;
   private static final String OPTION_ADJUST_FRAME_RATE = "-r";
   private static final String OPTION_BLACK_BACKGROUND = "-b";
   private static final String OPTION_PRINT_STATS = "-s";
@@ -40,14 +42,10 @@ public class OmxPlayer implements Player {
       OPTION_PRINT_STATS,
       OPTION_START_POSITION);
 
-  public static void main(String[] args) {
-    OmxPlayer player = new OmxPlayer();
-    player.play("/home/xix/Videos/clips/1.mp4", 0);
-  }
-
-  public OmxPlayer() {
+  public OmxPlayer(final EventsHandler eventsHandler) {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
+    this.eventsHandler = eventsHandler;
   }
 
   public void play(final String mediaPath) {
@@ -61,7 +59,7 @@ public class OmxPlayer implements Player {
     playerState = new PlayerState();
     playerState.setCurrentUri(mediaPath);
     playerState.setDuration(MediaInfo.getDuration(mediaPath));
-    ArrayList cmdCopy = new ArrayList(CMD);
+    ArrayList<String> cmdCopy = new ArrayList<>(CMD);
     cmdCopy.add(ModelUtil.toTimeString(startPosition));
     cmdCopy.add(mediaPath);
 
@@ -73,19 +71,16 @@ public class OmxPlayer implements Player {
       InputStream outIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      /*
-      stdOutConsumer is currently only consuming the output to avoid a deadlock
-       */
-      stdOutConsumer = new OmxPlayerErrorStreamConsumer(stdIn, playerState);
-      Thread one = new Thread(stdOutConsumer);
-      one.start();
+      errOutConsumer = new OmxPlayerOutputStreamConsumer(outIn, playerState, eventsHandler);
+      Thread two = new Thread(errOutConsumer);
+      two.start();
 
       /*
       errOutConsumer is currently only consuming the output to avoid a deadlock
        */
-      errOutConsumer = new OmxPlayerOutputStreamConsumer(outIn, playerState);
-      Thread two = new Thread(errOutConsumer);
-      two.start();
+      stdOutConsumer = new OmxPlayerErrorStreamConsumer(stdIn, playerState);
+      Thread one = new Thread(stdOutConsumer);
+      one.start();
 
     } catch (IOException ex) {
       ex.printStackTrace();
@@ -137,9 +132,9 @@ public class OmxPlayer implements Player {
     stdOut.flush();
   }
 
-  protected Thread cleanupThread = new Thread(() -> cleanup());
+  private Thread cleanupThread = new Thread(this::cleanup);
 
-  public void cleanup() {
+  private void cleanup() {
     LOGGER.log(Level.INFO, "clean up");
     if (isProcessAvailable()) {
       process.destroy();
@@ -154,11 +149,9 @@ public class OmxPlayer implements Player {
     return process != null;
   }
 
-  private void printCommand(ArrayList cmdCopy) {
+  private void printCommand(final ArrayList<String> cmdCopy) {
     final StringBuffer stringBuffer = new StringBuffer();
-    cmdCopy.stream().forEach(o -> {
-      stringBuffer.append(o).append(" ");
-    });
+    cmdCopy.stream().forEach(o -> stringBuffer.append(o).append(" "));
     LOGGER.info("Executing command: " + stringBuffer.toString());
   }
 }

@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.omxplayer;
 
+import io.neocdtv.player.core.EventsHandler;
 import io.neocdtv.player.core.PlayerState;
 
 import java.io.BufferedReader;
@@ -17,20 +18,26 @@ public class OmxPlayerOutputStreamConsumer implements Runnable {
 
   private final InputStream in;
   private final PlayerState playerState;
+  private final EventsHandler eventsHandler;
   private boolean active = true;
 
-  public OmxPlayerOutputStreamConsumer(InputStream in, PlayerState playerState) {
+  OmxPlayerOutputStreamConsumer(
+      final InputStream in,
+      final PlayerState playerState,
+      final EventsHandler eventsHandler) {
     this.in = in;
     this.playerState = playerState;
+    this.eventsHandler = eventsHandler;
   }
 
   public void run() {
     BufferedReader br = null;
     try {
       br = new BufferedReader(new InputStreamReader(in));
-      String line = null;
+      String line;
       while (active && (line = br.readLine()) != null) {
         LOGGER.info(line);
+        handleStreamEnded(line);
       }
     } catch (Exception e) {
       LOGGER.info("Exception: " + e.getMessage());
@@ -43,7 +50,17 @@ public class OmxPlayerOutputStreamConsumer implements Runnable {
     }
   }
 
-  public void deactivate() {
+  private void handleStreamEnded(final String line) {
+    if (isTrackEndedLine(line)) {
+      eventsHandler.onTrackEnded();
+    }
+  }
+
+  private boolean isTrackEndedLine(final String line) {
+    return line.matches(".*have a nice day.*");
+  }
+
+  void deactivate() {
     active = false;
   }
 }

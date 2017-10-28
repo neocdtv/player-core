@@ -1,1 +1,4 @@
 Update README.md
+
+add new events
+update omxplayer to support the events
