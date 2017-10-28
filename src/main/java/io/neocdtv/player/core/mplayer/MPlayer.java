@@ -55,7 +55,7 @@ public class MPlayer implements Player {
     playerState.setPosition(startPosition + ".0");
     playerState.setCurrentUri(mediaPath);
     playerState.setDuration(MediaInfo.getDuration(mediaPath));
-    ArrayList cmdCopy = new ArrayList(CMD);
+    ArrayList<String> cmdCopy = new ArrayList<>(CMD);
     cmdCopy.add(startPosition + "");
     cmdCopy.add(mediaPath);
 
@@ -120,9 +120,9 @@ public class MPlayer implements Player {
     stdOut.flush();
   }
 
-  protected Thread cleanupThread = new Thread(() -> cleanup());
+  private Thread cleanupThread = new Thread(this::cleanup);
 
-  public void cleanup() {
+  private void cleanup() {
     LOGGER.log(Level.INFO, "clean up");
     if (isProcessAvailable()) {
       process.destroy();
@@ -137,11 +137,9 @@ public class MPlayer implements Player {
     return process != null;
   }
 
-  private void printCommand(ArrayList cmdCopy) {
+  private void printCommand(ArrayList<String> cmdCopy) {
     final StringBuffer stringBuffer = new StringBuffer();
-    cmdCopy.stream().forEach(o -> {
-      stringBuffer.append(o).append(" ");
-    });
+    cmdCopy.stream().forEach(o -> stringBuffer.append(o).append(" "));
     LOGGER.info("Executing command: " + stringBuffer.toString());
   }
 }
