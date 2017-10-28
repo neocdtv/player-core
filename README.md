@@ -24,8 +24,13 @@ Ubuntu/Debian
 Java
 ======
     public static void main(String[] args) {
-        final Player player = PlayerFactory.getPlayer("omxplayer");
-        // final Player player = PlayerFactory.getPlayer("mplayer");
+        final EventsHandler eventsHandler = new MPlayerEventsHandler();
+        final Player player = new MPlayer(eventsHandler)
+        //final Player player = new OmxPlayer(eventsHandler);
         final String url = "http://somedomain.eu/video.mp4";
         player.play(url);
     }
+
+EventsHandler
+======
+You can find a example of a EventsHandler implementation in my other project: https://github.com/neocdtv/zenplayer/blob/master/zenplayer-renderer-standalone/src/main/java/io/neocdtv/zenplayer/renderer/MPlayerEventsHandler.java
