@@ -25,13 +25,13 @@ public class MPlayer implements Player {
   private MPlayerErrorStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
+  private final EventsHandler eventsHandler;
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String OPTION_MEDIA_INFO = "-identify";
   private static final String OPTION_NO_VIDEO = "-novideo";
   private static final String OPTION_NO_AUDIO = "-ao null";
   private static final String OPTION_START_POSITION = "-ss";
-  private final EventsHandler eventsHandler;
   private final static List<String> CMD = Arrays.asList(
       "mplayer",
       OPTION_MEDIA_INFO,
