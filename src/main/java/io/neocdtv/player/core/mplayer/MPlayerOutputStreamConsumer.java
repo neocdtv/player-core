@@ -1,6 +1,6 @@
 package io.neocdtv.player.core.mplayer;
 
-import io.neocdtv.player.core.EventsHandler;
+import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
 
 import java.io.BufferedReader;
@@ -21,16 +21,16 @@ public class MPlayerOutputStreamConsumer implements Runnable {
   private final static String QUIT = "QUIT";
   private final InputStream in;
   private final PlayerState playerState;
-  private final EventsHandler eventsHandler;
+  private final PlayerEventsHandler playerEventsHandler;
   private boolean active = true;
 
   public MPlayerOutputStreamConsumer(
       final InputStream in,
       final PlayerState playerState,
-      final EventsHandler eventsHandler) {
+      final PlayerEventsHandler playerEventsHandler) {
     this.in = in;
     this.playerState = playerState;
-    this.eventsHandler = eventsHandler;
+    this.playerEventsHandler = playerEventsHandler;
   }
 
   public void run() {
@@ -56,7 +56,7 @@ public class MPlayerOutputStreamConsumer implements Runnable {
 
   private void handleStreamEnded(String line) {
     if (isTrackEndedLine(line)) {
-      eventsHandler.onTrackEnded();
+      playerEventsHandler.onTrackEnded();
     }
   }
 

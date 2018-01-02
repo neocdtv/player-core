@@ -1,8 +1,7 @@
 package io.neocdtv.player.core.mplayer;
 
-import io.neocdtv.player.core.EventsHandler;
 import io.neocdtv.player.core.MediaInfo;
-import io.neocdtv.player.core.Player;
+import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
 
 import java.io.IOException;
@@ -17,7 +16,7 @@ import java.util.logging.Logger;
 /**
  * @author xix
  */
-public class MPlayer implements Player {
+public class MPlayer {
 
   private final static Logger LOGGER = Logger.getLogger(MPlayer.class.getName());
   private Process process = null;
@@ -25,7 +24,7 @@ public class MPlayer implements Player {
   private MPlayerErrorStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
-  private final EventsHandler eventsHandler;
+  private final PlayerEventsHandler playerEventsHandler;
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String OPTION_MEDIA_INFO = "-identify";
@@ -37,10 +36,10 @@ public class MPlayer implements Player {
       OPTION_MEDIA_INFO,
       OPTION_START_POSITION);
 
-  public MPlayer(final EventsHandler eventsHandler) {
+  public MPlayer(final PlayerEventsHandler playerEventsHandler) {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
-    this.eventsHandler = eventsHandler;
+    this.playerEventsHandler = playerEventsHandler;
   }
 
   public void play(final String mediaPath) {
@@ -67,7 +66,7 @@ public class MPlayer implements Player {
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, eventsHandler);
+      stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
       Thread one = new Thread(stdOutConsumer);
       one.start();
 

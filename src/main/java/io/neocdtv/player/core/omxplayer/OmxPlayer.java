@@ -1,9 +1,8 @@
 package io.neocdtv.player.core.omxplayer;
 
-import io.neocdtv.player.core.EventsHandler;
+import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.ModelUtil;
-import io.neocdtv.player.core.Player;
 import io.neocdtv.player.core.PlayerState;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
 /**
  * @author xix
  */
-public class OmxPlayer implements Player {
+public class OmxPlayer {
 
   private final static Logger LOGGER = Logger.getLogger(OmxPlayer.class.getName());
   private Process process = null;
@@ -26,7 +25,7 @@ public class OmxPlayer implements Player {
   private OmxPlayerOutputStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
-  private final EventsHandler eventsHandler;
+  private final PlayerEventsHandler playerEventsHandler;
   private static final String OPTION_ADJUST_FRAME_RATE = "-r";
   private static final String OPTION_BLACK_BACKGROUND = "-b";
   private static final String OPTION_PRINT_STATS = "-s";
@@ -42,10 +41,10 @@ public class OmxPlayer implements Player {
       OPTION_PRINT_STATS,
       OPTION_START_POSITION);
 
-  public OmxPlayer(final EventsHandler eventsHandler) {
+  public OmxPlayer(final PlayerEventsHandler playerEventsHandler) {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
-    this.eventsHandler = eventsHandler;
+    this.playerEventsHandler = playerEventsHandler;
   }
 
   public void play(final String mediaPath) {
@@ -71,7 +70,7 @@ public class OmxPlayer implements Player {
       InputStream outIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      errOutConsumer = new OmxPlayerOutputStreamConsumer(outIn, playerState, eventsHandler);
+      errOutConsumer = new OmxPlayerOutputStreamConsumer(outIn, playerState, playerEventsHandler);
       Thread two = new Thread(errOutConsumer);
       two.start();
 
