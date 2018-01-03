@@ -33,4 +33,4 @@ Java
 
 EventsHandler
 ======
-You can find a example of a EventsHandler implementation in my other project: https://github.com/neocdtv/zenplayer/blob/master/zenplayer-renderer-standalone/src/main/java/io/neocdtv/zenplayer/renderer/MPlayerEventsHandler.java
+You can find a example of a EventsHandler implementation in my other project: https://github.com/neocdtv/leanplayer-renderer/blob/master/src/main/java/io/neocdtv/leanplayer/renderer/control/MPlayerEventsHandler.java
