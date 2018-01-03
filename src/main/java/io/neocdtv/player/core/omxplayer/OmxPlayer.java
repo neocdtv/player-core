@@ -4,6 +4,8 @@ import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.ModelUtil;
 import io.neocdtv.player.core.PlayerState;
+import io.neocdtv.player.core.mplayer.MPlayerErrorStreamConsumer;
+import io.neocdtv.player.core.mplayer.MPlayerOutputStreamConsumer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,8 +23,8 @@ public class OmxPlayer {
 
   private final static Logger LOGGER = Logger.getLogger(OmxPlayer.class.getName());
   private Process process = null;
-  private OmxPlayerErrorStreamConsumer stdOutConsumer;
-  private OmxPlayerOutputStreamConsumer errOutConsumer;
+  private OmxPlayerOutputStreamConsumer stdOutConsumer;
+  private OmxPlayerErrorStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
   private final PlayerEventsHandler playerEventsHandler;
@@ -67,19 +69,16 @@ public class OmxPlayer {
     try {
       process = pb.start();
       InputStream stdIn = process.getInputStream();
-      InputStream outIn = process.getErrorStream();
+      InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      errOutConsumer = new OmxPlayerOutputStreamConsumer(outIn, playerState, playerEventsHandler);
-      Thread two = new Thread(errOutConsumer);
-      two.start();
-
-      /*
-      errOutConsumer is currently only consuming the output to avoid a deadlock
-       */
-      stdOutConsumer = new OmxPlayerErrorStreamConsumer(stdIn, playerState);
+      stdOutConsumer = new OmxPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
       Thread one = new Thread(stdOutConsumer);
       one.start();
+
+      errOutConsumer = new OmxPlayerErrorStreamConsumer(errIn, playerState);
+      Thread two = new Thread(errOutConsumer);
+      two.start();
 
     } catch (IOException ex) {
       ex.printStackTrace();
