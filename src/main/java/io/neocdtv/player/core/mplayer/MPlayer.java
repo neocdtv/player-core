@@ -57,7 +57,6 @@ public class MPlayer {
     ArrayList<String> cmdCopy = new ArrayList<>(CMD);
     cmdCopy.add(startPosition + "");
     cmdCopy.add(mediaPath);
-
     printCommand(cmdCopy);
     ProcessBuilder pb = new ProcessBuilder(cmdCopy);
     try {
