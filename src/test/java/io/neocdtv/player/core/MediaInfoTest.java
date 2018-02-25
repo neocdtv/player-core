@@ -1,10 +1,11 @@
 package io.neocdtv.player.core;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.URL;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  * MediaInfoTest.
@@ -21,6 +22,11 @@ public class MediaInfoTest {
     // when
     String duration = MediaInfo.getDuration(resource.getPath());
     // then
-    Assert.assertThat("7.00", CoreMatchers.equalTo(duration));
+    assertThat("7.00", equalTo(duration));
+  }
+
+  @Test
+  public void getDuration_no_file() {
+    assertThat(null, equalTo(MediaInfo.getDuration("/no/file.mp3")));
   }
 }
