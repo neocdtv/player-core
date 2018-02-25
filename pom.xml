@@ -12,11 +12,4 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   <name>player-core</name>
-  <dependencies>
-    <dependency>
-      <groupId>io.neocdtv</groupId>
-      <artifactId>StringUtilsEscapeBash</artifactId>
-      <version>1.1</version>
-    </dependency>
-  </dependencies>
 </project>
