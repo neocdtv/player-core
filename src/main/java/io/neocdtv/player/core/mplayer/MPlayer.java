@@ -14,7 +14,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * MPlayer.
+ *
  * @author xix
+ * @since 03.01.18
  */
 public class MPlayer {
 

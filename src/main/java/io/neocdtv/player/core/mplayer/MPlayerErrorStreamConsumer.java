@@ -9,7 +9,10 @@ import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
 /**
+ * MPlayerErrorStreamConsumer.
+ *
  * @author xix
+ * @since 03.01.18
  */
 public class MPlayerErrorStreamConsumer implements Runnable {
 

@@ -1,7 +1,10 @@
 package io.neocdtv.player.core;
 
 /**
- * Created by xix on 08.10.17.
+ * PlayerEventsHandler.
+ *
+ * @author xix
+ * @since 03.01.18
  */
 public interface PlayerEventsHandler {
 

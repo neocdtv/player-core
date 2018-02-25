@@ -10,7 +10,10 @@ import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
 /**
+ * OmxPlayerOutputStreamConsumer.
+ *
  * @author xix
+ * @since 03.01.18
  */
 public class OmxPlayerOutputStreamConsumer implements Runnable {
 

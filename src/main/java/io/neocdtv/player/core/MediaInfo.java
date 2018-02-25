@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
+ * MediaInfo.
+ *
  * @author xix
+ * @since 03.01.18
  */
 public class MediaInfo {
 

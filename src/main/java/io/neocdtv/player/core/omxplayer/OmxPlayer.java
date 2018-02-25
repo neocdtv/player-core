@@ -1,11 +1,9 @@
 package io.neocdtv.player.core.omxplayer;
 
-import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.ModelUtil;
+import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
-import io.neocdtv.player.core.mplayer.MPlayerErrorStreamConsumer;
-import io.neocdtv.player.core.mplayer.MPlayerOutputStreamConsumer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +15,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * OmxPlayer.
+ *
  * @author xix
+ * @since 03.01.18
  */
 public class OmxPlayer {
 
