@@ -9,4 +9,6 @@ package io.neocdtv.player.core;
 public interface PlayerEventsHandler {
 
   void onTrackEnded();
+
+  void onStaringPlayback();
 }

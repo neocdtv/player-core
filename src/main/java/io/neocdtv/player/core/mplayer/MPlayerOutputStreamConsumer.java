@@ -43,6 +43,7 @@ public class MPlayerOutputStreamConsumer implements Runnable {
       String line = null;
       while (active && (line = br.readLine()) != null) {
         LOGGER.info(line);
+        handleStartingPlayback(line);
         handlePosition(line);
         handleStreamEnded(line);
       }
@@ -55,6 +56,16 @@ public class MPlayerOutputStreamConsumer implements Runnable {
         LOGGER.info(e.getMessage());
       }
     }
+  }
+
+  private void handleStartingPlayback(final String line) {
+    if (isStartingPlaybackLine(line)) {
+      playerEventsHandler.onStaringPlayback();
+    }
+  }
+
+  private boolean isStartingPlaybackLine(final String line) {
+    return line.startsWith("Starting playback");
   }
 
   private void handleStreamEnded(String line) {

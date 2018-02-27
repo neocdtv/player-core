@@ -45,12 +45,12 @@ public class MPlayer {
     this.playerEventsHandler = playerEventsHandler;
   }
 
-  public void play(final String mediaPath) {
+  public void play(final String mediaPath) throws InterruptedException {
     LOGGER.log(Level.INFO, "play " + mediaPath);
     play(mediaPath, 0);
   }
 
-  public void play(final String mediaPath, final long startPosition) {
+  public void play(final String mediaPath, final long startPosition) throws InterruptedException {
     stop();
     LOGGER.log(Level.INFO, "play: " + mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
@@ -69,12 +69,14 @@ public class MPlayer {
       stdOut = new PrintStream(process.getOutputStream());
 
       stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
-      Thread one = new Thread(stdOutConsumer);
-      one.start();
+      Thread stdOutThread = new Thread(stdOutConsumer);
+      stdOutThread.start();
 
       errOutConsumer = new MPlayerErrorStreamConsumer(errIn, playerState);
-      Thread two = new Thread(errOutConsumer);
-      two.start();
+      Thread errOutThread = new Thread(errOutConsumer);
+      errOutThread.start();
+
+      process.waitFor();
 
     } catch (IOException ex) {
       ex.printStackTrace();
@@ -100,7 +102,7 @@ public class MPlayer {
     sendCommand(COMMAND_PAUSE);
   }
 
-  public void skip(long seconds) {
+  public void skip(long seconds) throws InterruptedException {
     LOGGER.log(Level.INFO, "skip: " + seconds);
     play(playerState.getCurrentUri(), seconds);
   }
