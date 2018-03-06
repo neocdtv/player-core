@@ -55,7 +55,7 @@ public class MPlayer {
     stop();
     LOGGER.log(Level.INFO, "play: " + mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
-    playerState.setPosition(startPosition + ".0");
+    playerState.setPosition(mapPosition(startPosition));
     playerState.setCurrentUri(mediaPath);
     playerState.setDuration(MediaInfo.getDuration(mediaPath));
     ArrayList<String> cmdCopy = new ArrayList<>(CMD);
@@ -80,6 +80,10 @@ public class MPlayer {
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+  }
+
+  private String mapPosition(long startPosition) {
+    return startPosition + ".0";
   }
 
   public void stop() {
