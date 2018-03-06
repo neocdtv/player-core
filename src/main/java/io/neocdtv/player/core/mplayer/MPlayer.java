@@ -50,6 +50,7 @@ public class MPlayer {
     play(mediaPath, 0);
   }
 
+  // TODO: check out pb.redirectErrorStream and maybe remove in future MPlayerErrorStreamConsumer
   public void play(final String mediaPath, final long startPosition) throws InterruptedException {
     stop();
     LOGGER.log(Level.INFO, "play: " + mediaPath + ", startPosition: " + startPosition);
