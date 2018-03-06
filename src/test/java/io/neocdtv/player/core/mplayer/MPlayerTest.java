@@ -2,8 +2,10 @@ package io.neocdtv.player.core.mplayer;
 
 import io.neocdtv.player.core.PlayerEventsHandlerForTests;
 import org.junit.Test;
+import org.mockito.exceptions.verification.WantedButNotInvoked;
 
 import java.net.URL;
+import java.util.logging.Logger;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -17,7 +19,9 @@ import static org.mockito.Mockito.verify;
  */
 public class MPlayerTest {
 
-  PlayerEventsHandlerForTests eventsHandler = spy(new PlayerEventsHandlerForTests());
+  private static final Logger LOGGER = Logger.getLogger(MPlayerTest.class.getName());
+  private static final int MILLIS = 250;
+  private PlayerEventsHandlerForTests eventsHandler = spy(new PlayerEventsHandlerForTests());
   private MPlayer mplayer = new MPlayer(eventsHandler);
 
   @Test
@@ -27,8 +31,24 @@ public class MPlayerTest {
     // when
     mplayer.play(resource.getPath());
     // then
-    verify(eventsHandler).onStaringPlayback();
-    verify(eventsHandler).onTrackEnded();
+    boolean checkAgain = true;
+    int currentCheck = 0;
+    final int maxChecks = 10;
+    while (checkAgain) {
+      try {
+        verify(eventsHandler).onStaringPlayback();
+        verify(eventsHandler).onTrackEnded();
+        checkAgain = false;
+      } catch (WantedButNotInvoked e) {
+        currentCheck++;
+        if (currentCheck <= maxChecks) {
+          LOGGER.info("Verification didn't work, sleeping " + MILLIS + "ms and trying again");
+          Thread.sleep(MILLIS);
+        } else {
+          throw e;
+        }
+      }
+    }
   }
 
   @Test
@@ -36,8 +56,7 @@ public class MPlayerTest {
     // when
     mplayer.play("non_existent_file");
     // then
-    verify(eventsHandler, never()).onStaringPlayback();
-    verify(eventsHandler).onTrackEnded();
+    verifyBehaviour();
   }
 
   @Test
@@ -47,7 +66,27 @@ public class MPlayerTest {
     // when
     mplayer.play(resource.getPath());
     // then
-    verify(eventsHandler, never()).onStaringPlayback();
-    verify(eventsHandler).onTrackEnded();
+    verifyBehaviour();
+  }
+
+  private void verifyBehaviour() throws InterruptedException {
+    boolean checkAgain = true;
+    int currentCheck = 0;
+    final int maxChecks = 10;
+    while (checkAgain) {
+      try {
+        verify(eventsHandler, never()).onStaringPlayback();
+        verify(eventsHandler).onTrackEnded();
+        checkAgain = false;
+      } catch (WantedButNotInvoked e) {
+        currentCheck++;
+        if (currentCheck <= maxChecks) {
+          LOGGER.info("Verification didn't work, sleeping " + MILLIS + "ms and trying again");
+          Thread.sleep(MILLIS);
+        } else {
+          throw e;
+        }
+      }
+    }
   }
 }

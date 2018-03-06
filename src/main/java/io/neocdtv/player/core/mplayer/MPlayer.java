@@ -77,8 +77,6 @@ public class MPlayer {
       Thread errOutThread = new Thread(errOutConsumer);
       errOutThread.start();
 
-      process.waitFor();
-
     } catch (IOException ex) {
       ex.printStackTrace();
     }

@@ -22,7 +22,7 @@ public class MediaInfoTest {
     // when
     String duration = MediaInfo.getDuration(resource.getPath());
     // then
-    assertThat("7.00", equalTo(duration));
+    assertThat("1.00", equalTo(duration));
   }
 
   @Test
