@@ -11,10 +11,4 @@ public interface PlayerEventsHandler {
   void onTrackEnded();
 
   void onStaringPlayback();
-
-  // TODO: add move events?
-
-  // void onPause();
-
-  // void onVolumeChange
 }

@@ -46,14 +46,14 @@ public class MPlayer {
   }
 
   public void play(final String mediaPath) throws InterruptedException {
-    LOGGER.log(Level.INFO, "play " + mediaPath);
+    LOGGER.log(Level.INFO, mediaPath);
     play(mediaPath, 0);
   }
 
   // TODO: check out pb.redirectErrorStream and maybe remove in future MPlayerErrorStreamConsumer
   public void play(final String mediaPath, final long startPosition) throws InterruptedException {
     stop();
-    LOGGER.log(Level.INFO, "play: " + mediaPath + ", startPosition: " + startPosition);
+    LOGGER.log(Level.INFO, mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
     playerState.setPosition(mapPosition(startPosition));
     playerState.setCurrentUri(mediaPath);
@@ -62,9 +62,9 @@ public class MPlayer {
     cmdCopy.add(startPosition + "");
     cmdCopy.add(mediaPath);
     printCommand(cmdCopy);
-    ProcessBuilder pb = new ProcessBuilder(cmdCopy);
+    ProcessBuilder processBuilder = new ProcessBuilder(cmdCopy);
     try {
-      process = pb.start();
+      process = processBuilder.start();
       InputStream stdIn = process.getInputStream();
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
@@ -77,8 +77,8 @@ public class MPlayer {
       Thread errOutThread = new Thread(errOutConsumer);
       errOutThread.start();
 
-    } catch (IOException ex) {
-      ex.printStackTrace();
+    } catch (IOException ioException) {
+      LOGGER.log(Level.SEVERE, ioException.getMessage(), ioException);
     }
   }
 
@@ -87,41 +87,36 @@ public class MPlayer {
   }
 
   public void stop() {
-    LOGGER.log(Level.INFO, "stop");
     if (isProcessAvailable()) {
       stdOutConsumer.deactivate();
       errOutConsumer.deactivate();
-      sendCommand(COMMAND_QUIT);
+      execute(COMMAND_QUIT);
       try {
         process.waitFor();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      } catch (InterruptedException interruptedException) {
+        LOGGER.log(Level.SEVERE, interruptedException.getMessage(), interruptedException);
       }
     }
   }
 
   public void pause() {
-    LOGGER.log(Level.INFO, "pause");
-    sendCommand(COMMAND_PAUSE);
+    execute(COMMAND_PAUSE);
   }
 
   public void skip(long seconds) throws InterruptedException {
-    LOGGER.log(Level.INFO, "skip: " + seconds);
     play(playerState.getCurrentUri(), seconds);
   }
 
   public long getPosition() {
-    LOGGER.log(Level.INFO, "position");
     return playerState.getPosition();
   }
 
   public long getDuration() {
-    LOGGER.log(Level.INFO, "duration");
     return playerState.getDuration();
   }
 
-  private void sendCommand(final String command) {
-    LOGGER.log(Level.INFO, "send command: " + command);
+  private void execute(final String command) {
+    LOGGER.log(Level.INFO, "execute: " + command);
     stdOut.print(command);
     stdOut.flush();
   }

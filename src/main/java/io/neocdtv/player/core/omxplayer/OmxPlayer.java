@@ -51,13 +51,13 @@ public class OmxPlayer {
   }
 
   public void play(final String mediaPath) {
-    LOGGER.log(Level.INFO, "play " + mediaPath);
+    LOGGER.log(Level.INFO, mediaPath);
     play(mediaPath, 0);
   }
 
   public void play(final String mediaPath, final long startPosition) {
     stop();
-    LOGGER.log(Level.INFO, "play: " + mediaPath + ", startPosition: " + startPosition);
+    LOGGER.log(Level.INFO, mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
     playerState.setCurrentUri(mediaPath);
     playerState.setDuration(MediaInfo.getDuration(mediaPath));
@@ -66,9 +66,9 @@ public class OmxPlayer {
     cmdCopy.add(mediaPath);
 
     printCommand(cmdCopy);
-    ProcessBuilder pb = new ProcessBuilder(cmdCopy);
+    ProcessBuilder processBuilder = new ProcessBuilder(cmdCopy);
     try {
-      process = pb.start();
+      process = processBuilder.start();
       InputStream stdIn = process.getInputStream();
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
@@ -77,21 +77,20 @@ public class OmxPlayer {
       Thread one = new Thread(stdOutConsumer);
       one.start();
 
-      errOutConsumer = new OmxPlayerErrorStreamConsumer(errIn, playerState);
+      errOutConsumer = new OmxPlayerErrorStreamConsumer(errIn);
       Thread two = new Thread(errOutConsumer);
       two.start();
 
-    } catch (IOException ex) {
-      ex.printStackTrace();
+    } catch (IOException ioException) {
+      LOGGER.log(Level.SEVERE, ioException.getMessage(), ioException);
     }
   }
 
   public void stop() {
-    LOGGER.log(Level.INFO, "stop");
     if (isProcessAvailable()) {
       stdOutConsumer.deactivate();
       errOutConsumer.deactivate();
-      sendCommand(COMMAND_QUIT);
+      execute(COMMAND_QUIT);
       try {
         process.waitFor();
       } catch (InterruptedException e) {
@@ -101,32 +100,27 @@ public class OmxPlayer {
   }
 
   public void pause() {
-    LOGGER.log(Level.INFO, "pause");
-    sendCommand(COMMAND_PAUSE);
+    execute(COMMAND_PAUSE);
   }
 
   public void skip(long seconds) {
-    LOGGER.log(Level.INFO, "skip: " + seconds);
     play(playerState.getCurrentUri(), seconds);
   }
 
   public long getPosition() {
-    LOGGER.log(Level.INFO, "position");
     return playerState.getPosition();
   }
 
   public long getDuration() {
-    LOGGER.log(Level.INFO, "duration");
     return playerState.getDuration();
   }
 
   public float getPositionPercentage() {
-    LOGGER.log(Level.INFO, "position percentage");
     throw new RuntimeException("NOT IMPLEMENTED");
   }
 
-  private void sendCommand(final String command) {
-    LOGGER.log(Level.INFO, "send command: " + command);
+  private void execute(final String command) {
+    LOGGER.log(Level.INFO, "execute: " + command);
     stdOut.print(command);
     stdOut.flush();
   }

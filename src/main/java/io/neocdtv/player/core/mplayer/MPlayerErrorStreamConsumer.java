@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -26,20 +27,20 @@ public class MPlayerErrorStreamConsumer implements Runnable {
   }
 
   public void run() {
-    BufferedReader br = null;
+    BufferedReader bufferedReader = null;
     try {
-      br = new BufferedReader(new InputStreamReader(in));
+      bufferedReader = new BufferedReader(new InputStreamReader(in));
       String line = null;
-      while (active && (line = br.readLine()) != null) {
-        LOGGER.info(line);
+      while (active && (line = bufferedReader.readLine()) != null) {
+        LOGGER.log(Level.FINE, line);
       }
-    } catch (Exception e) {
-      LOGGER.info("Exception: " + e.getMessage());
+    } catch (Exception exception) {
+      LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
     } finally {
       try {
-        br.close();
-      } catch (IOException e) {
-        LOGGER.info(e.getMessage());
+        bufferedReader.close();
+      } catch (IOException ioException) {
+        LOGGER.log(Level.SEVERE, ioException.getMessage(), ioException);
       }
     }
   }
