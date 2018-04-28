@@ -73,7 +73,7 @@ public class OmxPlayer {
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      stdOutConsumer = new OmxPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
+      stdOutConsumer = new OmxPlayerOutputStreamConsumer(stdIn, playerEventsHandler);
       Thread one = new Thread(stdOutConsumer);
       one.start();
 

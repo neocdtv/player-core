@@ -20,16 +20,13 @@ public class OmxPlayerOutputStreamConsumer implements Runnable {
   private final static Logger LOGGER = Logger.getLogger(OmxPlayerOutputStreamConsumer.class.getName());
 
   private final InputStream in;
-  private final PlayerState playerState;
   private final PlayerEventsHandler playerEventsHandler;
   private boolean active = true;
 
   OmxPlayerOutputStreamConsumer(
       final InputStream in,
-      final PlayerState playerState,
       final PlayerEventsHandler playerEventsHandler) {
     this.in = in;
-    this.playerState = playerState;
     this.playerEventsHandler = playerEventsHandler;
   }
 
