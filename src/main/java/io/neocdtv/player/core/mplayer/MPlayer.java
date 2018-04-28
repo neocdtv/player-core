@@ -73,7 +73,7 @@ public class MPlayer {
       Thread stdOutThread = new Thread(stdOutConsumer);
       stdOutThread.start();
 
-      errOutConsumer = new MPlayerErrorStreamConsumer(errIn, playerState);
+      errOutConsumer = new MPlayerErrorStreamConsumer(errIn);
       Thread errOutThread = new Thread(errOutConsumer);
       errOutThread.start();
 

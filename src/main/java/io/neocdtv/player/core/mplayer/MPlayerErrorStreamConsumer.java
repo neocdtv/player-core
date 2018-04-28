@@ -19,12 +19,10 @@ public class MPlayerErrorStreamConsumer implements Runnable {
   private final static Logger LOGGER = Logger.getLogger(MPlayerErrorStreamConsumer.class.getName());
 
   private final InputStream in;
-  private final PlayerState playerState;
   private boolean active = true;
 
-  public MPlayerErrorStreamConsumer(InputStream in, PlayerState playerState) {
+  public MPlayerErrorStreamConsumer(InputStream in) {
     this.in = in;
-    this.playerState = playerState;
   }
 
   public void run() {
