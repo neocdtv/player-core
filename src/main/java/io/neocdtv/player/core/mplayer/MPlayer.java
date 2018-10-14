@@ -130,18 +130,26 @@ public class MPlayer {
     execute(COMMAND_DECREASE_VOLUME);
   }
 
+  public int getVolumeInMillibels() {
+    return playerState.getVolumeInMillidels();
+  }
+
   /**
    * Sets the audio playback volume. Its effect will be clamped to the range [0.0, 1.0]
    *
    * @param volume the volume
    */
   public void setVolume(double volume) {
+    int millibels = 0;
     if (volume >= 1.0) {
-      amixer.setVolume(MAX_VOLUME_IN_MILLIBELS);
+      millibels = MAX_VOLUME_IN_MILLIBELS;
     } else {
       double realVolume = 1 - volume;
-      amixer.setVolume((int) ((MIN_VOLUME_IN_MILLIBELS * realVolume) + MAX_VOLUME_IN_MILLIBELS));
+      millibels = (int) ((MIN_VOLUME_IN_MILLIBELS * realVolume) + MAX_VOLUME_IN_MILLIBELS);
     }
+
+    playerState.setVolume(millibels);
+    amixer.setVolume(millibels);
   }
 
   private void execute(final String command) {

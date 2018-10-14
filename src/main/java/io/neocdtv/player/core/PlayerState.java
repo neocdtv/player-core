@@ -10,7 +10,7 @@ public class PlayerState {
   private String currentUri;
   private String position;
   private String duration;
-  private int volumeInMillidels;
+  private int volumeInMillidels = -1;
 
   public void setCurrentUri(String currentUri) {
     this.currentUri = currentUri;
