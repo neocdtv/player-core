@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.mplayer;
 
+import io.neocdtv.player.core.LoggerUtil;
 import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
@@ -36,15 +37,19 @@ public class MPlayer {
   private static final String OPTION_NO_VIDEO = "-novideo";
   private static final String OPTION_NO_AUDIO = "-ao null";
   private static final String OPTION_START_POSITION = "-ss";
+  private static final int MAX_VOLUME_IN_MILLIBELS = 400;
+  private static final int MIN_VOLUME_IN_MILLIBELS = -9600;
   private final static List<String> CMD = Arrays.asList(
       "mplayer",
       OPTION_MEDIA_INFO,
       OPTION_START_POSITION);
+  private final Amixer amixer;
 
-  public MPlayer(final PlayerEventsHandler playerEventsHandler) {
+  public MPlayer(final PlayerEventsHandler playerEventsHandler, final Amixer amixer) {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
     this.playerEventsHandler = playerEventsHandler;
+    this.amixer = amixer;
   }
 
   public void play(final String mediaPath) throws InterruptedException {
@@ -125,6 +130,19 @@ public class MPlayer {
     execute(COMMAND_DECREASE_VOLUME);
   }
 
+  /**
+   * Sets the audio playback volume. Its effect will be clamped to the range [0.0, 1.0]
+   *
+   * @param volume the volume
+   */
+  public void setVolume(double volume) throws IOException {
+    if (volume >= 1.0) {
+      amixer.setVolume(MAX_VOLUME_IN_MILLIBELS);
+    } else {
+      double realVolume = 1 - volume;
+      amixer.setVolume((int) ((MIN_VOLUME_IN_MILLIBELS * realVolume) + MAX_VOLUME_IN_MILLIBELS));
+    }
+  }
 
   private void execute(final String command) {
     LOGGER.log(Level.INFO, "execute: " + command);
@@ -149,9 +167,7 @@ public class MPlayer {
     return process != null;
   }
 
-  private void printCommand(ArrayList<String> cmdCopy) {
-    final StringBuffer stringBuffer = new StringBuffer();
-    cmdCopy.stream().forEach(o -> stringBuffer.append(o).append(" "));
-    LOGGER.info("Executing command: " + stringBuffer.toString());
+  private void printCommand(final ArrayList<String> cmdCopy) {
+    LoggerUtil.printCommand(LOGGER, cmdCopy);
   }
 }

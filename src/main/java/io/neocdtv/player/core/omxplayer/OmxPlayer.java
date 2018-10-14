@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.omxplayer;
 
+import io.neocdtv.player.core.LoggerUtil;
 import io.neocdtv.player.core.ModelUtil;
 import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
@@ -34,7 +35,7 @@ public class OmxPlayer {
   private static final String OPTION_PRINT_STATS = "-s";
   private static final String OPTION_PRINT_INFORMATION = "-I";
   private static final String OPTION_START_POSITION = "-l";
-  private static final String OPTION_INITIAL_VOLUME= "--vol";
+  private static final String OPTION_INITIAL_VOLUME = "--vol";
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String COMMAND_INCREASE_VOLUME = "+";
@@ -131,7 +132,7 @@ public class OmxPlayer {
   }
 
   public void increaseVolume() {
-    if(volume < MAX_VOLUME_IN_MILLIBELS) {
+    if (volume < MAX_VOLUME_IN_MILLIBELS) {
       execute(COMMAND_INCREASE_VOLUME);
       volume += 300;
       playerState.setVolume(volume);
@@ -139,7 +140,7 @@ public class OmxPlayer {
   }
 
   public void decreaseVolume() {
-    if(volume > MIN_VOLUME_IN_MILLIBELS) {
+    if (volume > MIN_VOLUME_IN_MILLIBELS) {
       execute(COMMAND_DECREASE_VOLUME);
       volume -= 300;
       playerState.setVolume(volume);
@@ -170,8 +171,6 @@ public class OmxPlayer {
   }
 
   private void printCommand(final ArrayList<String> cmdCopy) {
-    final StringBuffer stringBuffer = new StringBuffer();
-    cmdCopy.stream().forEach(o -> stringBuffer.append(o).append(" "));
-    LOGGER.info("Executing command: " + stringBuffer.toString());
+    LoggerUtil.printCommand(LOGGER, cmdCopy);
   }
 }

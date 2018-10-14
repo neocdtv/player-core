@@ -22,7 +22,7 @@ public class MPlayerTest {
   private static final Logger LOGGER = Logger.getLogger(MPlayerTest.class.getName());
   private static final int MILLIS = 250;
   private PlayerEventsHandlerForTests eventsHandler = spy(new PlayerEventsHandlerForTests());
-  private MPlayer mplayer = new MPlayer(eventsHandler);
+  private MPlayer mplayer = new MPlayer(eventsHandler, new Amixer("mono"));
 
   @Test
   public void startingPlayback() throws InterruptedException {
