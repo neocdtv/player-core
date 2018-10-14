@@ -1,6 +1,5 @@
 package io.neocdtv.player.core.omxplayer;
 
-import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.ModelUtil;
 import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
@@ -28,14 +27,20 @@ public class OmxPlayer {
   private OmxPlayerErrorStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
+  private int volume = -3000;
   private final PlayerEventsHandler playerEventsHandler;
   private static final String OPTION_ADJUST_FRAME_RATE = "-r";
   private static final String OPTION_BLACK_BACKGROUND = "-b";
   private static final String OPTION_PRINT_STATS = "-s";
   private static final String OPTION_PRINT_INFORMATION = "-I";
   private static final String OPTION_START_POSITION = "-l";
+  private static final String OPTION_INITIAL_VOLUME= "--vol";
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
+  private static final String COMMAND_INCREASE_VOLUME = "+";
+  private static final String COMMAND_DECREASE_VOLUME = "-";
+  private static final int MAX_VOLUME_IN_MILLIBELS = 600;
+  private static final int MIN_VOLUME_IN_MILLIBELS = -6000;
   private final static List<String> CMD = Arrays.asList(
       "omxplayer",
       OPTION_PRINT_INFORMATION,
@@ -60,9 +65,11 @@ public class OmxPlayer {
     LOGGER.log(Level.INFO, mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
     playerState.setCurrentUri(mediaPath);
-    playerState.setDuration(MediaInfo.getDuration(mediaPath));
+    playerState.setVolume(volume);
     ArrayList<String> cmdCopy = new ArrayList<>(CMD);
     cmdCopy.add(ModelUtil.toTimeString(startPosition));
+    cmdCopy.add(OPTION_INITIAL_VOLUME);
+    cmdCopy.add(String.valueOf(volume));
     cmdCopy.add(mediaPath);
 
     printCommand(cmdCopy);
@@ -115,8 +122,28 @@ public class OmxPlayer {
     return playerState.getDuration();
   }
 
+  public int getVolumeInMillibels() {
+    return playerState.getVolumeInMillidels();
+  }
+
   public float getPositionPercentage() {
     throw new RuntimeException("NOT IMPLEMENTED");
+  }
+
+  public void increaseVolume() {
+    if(volume < MAX_VOLUME_IN_MILLIBELS) {
+      execute(COMMAND_INCREASE_VOLUME);
+      volume += 300;
+      playerState.setVolume(volume);
+    }
+  }
+
+  public void decreaseVolume() {
+    if(volume > MIN_VOLUME_IN_MILLIBELS) {
+      execute(COMMAND_DECREASE_VOLUME);
+      volume -= 300;
+      playerState.setVolume(volume);
+    }
   }
 
   private void execute(final String command) {

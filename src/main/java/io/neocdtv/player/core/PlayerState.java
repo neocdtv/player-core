@@ -10,6 +10,7 @@ public class PlayerState {
   private String currentUri;
   private String position;
   private String duration;
+  private int volumeInMillidels;
 
   public void setCurrentUri(String currentUri) {
     this.currentUri = currentUri;
@@ -21,6 +22,14 @@ public class PlayerState {
 
   public void setDuration(String duration) {
     this.duration = duration;
+  }
+
+  public void setVolume(int volumeInMillidels) {
+    this.volumeInMillidels = volumeInMillidels;
+  }
+
+  public int getVolumeInMillidels() {
+    return volumeInMillidels;
   }
 
   public long getPosition() {
@@ -43,6 +52,7 @@ public class PlayerState {
         "currentUri='" + currentUri + '\'' +
         ", position='" + position + '\'' +
         ", duration='" + duration + '\'' +
+        ", volumeInMillidels='" + volumeInMillidels + '\'' +
         '}';
   }
 }
