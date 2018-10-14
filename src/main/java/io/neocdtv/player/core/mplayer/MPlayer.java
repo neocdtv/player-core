@@ -31,6 +31,8 @@ public class MPlayer {
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String OPTION_MEDIA_INFO = "-identify";
+  private static final String COMMAND_INCREASE_VOLUME = "0";
+  private static final String COMMAND_DECREASE_VOLUME = "9";
   private static final String OPTION_NO_VIDEO = "-novideo";
   private static final String OPTION_NO_AUDIO = "-ao null";
   private static final String OPTION_START_POSITION = "-ss";
@@ -114,6 +116,15 @@ public class MPlayer {
   public long getDuration() {
     return playerState.getDuration();
   }
+
+  public void increaseVolume() {
+    execute(COMMAND_INCREASE_VOLUME);
+  }
+
+  public void decreaseVolume() {
+    execute(COMMAND_DECREASE_VOLUME);
+  }
+
 
   private void execute(final String command) {
     LOGGER.log(Level.INFO, "execute: " + command);
