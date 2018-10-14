@@ -135,7 +135,7 @@ public class MPlayer {
    *
    * @param volume the volume
    */
-  public void setVolume(double volume) throws IOException {
+  public void setVolume(double volume) {
     if (volume >= 1.0) {
       amixer.setVolume(MAX_VOLUME_IN_MILLIBELS);
     } else {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Amixer {
@@ -19,14 +20,19 @@ public class Amixer {
     this.cmd = Arrays.asList("amixer", "sset", channelName, "--");
   }
 
-  public void setVolume(int millibels) throws IOException {
+  public void setVolume(int millibels) {
     ArrayList<String> cmdCopy = new ArrayList<String>(cmd);
     cmdCopy.add(String.valueOf(millibels));
 
     LoggerUtil.printCommand(LOGGER, cmdCopy);
 
     ProcessBuilder processBuilder = new ProcessBuilder(cmdCopy);
-    Process process = processBuilder.start();
+
+    try {
+      Process process = processBuilder.start();
+    } catch (IOException exception) {
+      LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
+    }
   }
 
 }
