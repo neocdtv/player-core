@@ -29,7 +29,7 @@ public class OmxPlayer {
   private PrintStream stdOut;
   private PlayerState playerState;
   private int volume = -3000;
-  private final PlayerEventsHandler playerEventsHandler;
+  private PlayerEventsHandler playerEventsHandler;
   private static final String OPTION_ADJUST_FRAME_RATE = "-r";
   private static final String OPTION_BLACK_BACKGROUND = "-b";
   private static final String OPTION_PRINT_STATS = "-s";
@@ -50,9 +50,12 @@ public class OmxPlayer {
       OPTION_PRINT_STATS,
       OPTION_START_POSITION);
 
-  public OmxPlayer(final PlayerEventsHandler playerEventsHandler) {
+  public OmxPlayer() {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
+  }
+
+  public void addPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
     this.playerEventsHandler = playerEventsHandler;
   }
 
@@ -81,9 +84,11 @@ public class OmxPlayer {
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      stdOutConsumer = new OmxPlayerOutputStreamConsumer(stdIn, playerEventsHandler);
-      Thread one = new Thread(stdOutConsumer);
-      one.start();
+      if (playerEventsHandler != null) {
+        stdOutConsumer = new OmxPlayerOutputStreamConsumer(stdIn, playerEventsHandler);
+        Thread stdOutThread = new Thread(stdOutConsumer);
+        stdOutThread.start();
+      }
 
       errOutConsumer = new OmxPlayerErrorStreamConsumer(errIn);
       Thread two = new Thread(errOutConsumer);
@@ -96,7 +101,9 @@ public class OmxPlayer {
 
   public void stop() {
     if (isProcessAvailable()) {
-      stdOutConsumer.deactivate();
+      if (stdOutConsumer != null) {
+        stdOutConsumer.deactivate();
+      }
       errOutConsumer.deactivate();
       execute(COMMAND_QUIT);
       try {

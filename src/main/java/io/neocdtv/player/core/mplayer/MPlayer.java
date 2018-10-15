@@ -28,7 +28,7 @@ public class MPlayer {
   private MPlayerErrorStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
-  private final PlayerEventsHandler playerEventsHandler;
+  private PlayerEventsHandler playerEventsHandler;
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String OPTION_MEDIA_INFO = "-identify";
@@ -45,21 +45,23 @@ public class MPlayer {
       OPTION_START_POSITION);
   private final Amixer amixer;
 
-  public MPlayer(final PlayerEventsHandler playerEventsHandler, final Amixer amixer) {
+  public MPlayer(final Amixer amixer) {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
-    this.playerEventsHandler = playerEventsHandler;
     this.amixer = amixer;
   }
 
-  public void play(final String mediaPath) throws InterruptedException {
+  public void play(final String mediaPath) {
     LOGGER.log(Level.INFO, mediaPath);
     play(mediaPath, 0);
   }
 
+  public void addPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
+    this.playerEventsHandler = playerEventsHandler;
+  }
+
   // TODO: check out pb.redirectErrorStream and maybe remove in future MPlayerErrorStreamConsumer
-  public void play(final String mediaPath, final long startPosition) throws InterruptedException {
-    stop();
+  public void play(final String mediaPath, final long startPosition) {
     LOGGER.log(Level.INFO, mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
     playerState.setPosition(mapPosition(startPosition));
@@ -76,9 +78,11 @@ public class MPlayer {
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
-      Thread stdOutThread = new Thread(stdOutConsumer);
-      stdOutThread.start();
+      if (playerEventsHandler != null) {
+        stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
+        Thread stdOutThread = new Thread(stdOutConsumer);
+        stdOutThread.start();
+      }
 
       errOutConsumer = new MPlayerErrorStreamConsumer(errIn);
       Thread errOutThread = new Thread(errOutConsumer);
@@ -95,7 +99,9 @@ public class MPlayer {
 
   public void stop() {
     if (isProcessAvailable()) {
-      stdOutConsumer.deactivate();
+      if (stdOutConsumer != null) {
+        stdOutConsumer.deactivate();
+      }
       errOutConsumer.deactivate();
       execute(COMMAND_QUIT);
       try {
