@@ -1,7 +1,6 @@
 package io.neocdtv.player.core.omxplayer;
 
 import io.neocdtv.player.core.PlayerEventsHandler;
-import io.neocdtv.player.core.PlayerState;
 
 import java.io.BufferedReader;
 import java.io.IOException;

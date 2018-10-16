@@ -1,4 +1,5 @@
-.idea/**
+.idea
 target/**
-*.iml
+**.iml
 player-core.iml
+classes/**
