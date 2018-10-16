@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.mplayer;
 
+import io.neocdtv.player.core.LoggerUtil;
 import io.neocdtv.player.core.MediaInfo;
 import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
@@ -27,32 +28,40 @@ public class MPlayer {
   private MPlayerErrorStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
-  private final PlayerEventsHandler playerEventsHandler;
+  private PlayerEventsHandler playerEventsHandler;
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String OPTION_MEDIA_INFO = "-identify";
+  private static final String COMMAND_INCREASE_VOLUME = "0";
+  private static final String COMMAND_DECREASE_VOLUME = "9";
   private static final String OPTION_NO_VIDEO = "-novideo";
   private static final String OPTION_NO_AUDIO = "-ao null";
   private static final String OPTION_START_POSITION = "-ss";
+  private static final int MAX_VOLUME_IN_MILLIBELS = 400;
+  private static final int MIN_VOLUME_IN_MILLIBELS = -9600;
   private final static List<String> CMD = Arrays.asList(
       "mplayer",
       OPTION_MEDIA_INFO,
       OPTION_START_POSITION);
+  private final Amixer amixer;
 
-  public MPlayer(final PlayerEventsHandler playerEventsHandler) {
+  public MPlayer(final Amixer amixer) {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
-    this.playerEventsHandler = playerEventsHandler;
+    this.amixer = amixer;
   }
 
-  public void play(final String mediaPath) throws InterruptedException {
+  public void play(final String mediaPath) {
     LOGGER.log(Level.INFO, mediaPath);
     play(mediaPath, 0);
   }
 
+  public void addPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
+    this.playerEventsHandler = playerEventsHandler;
+  }
+
   // TODO: check out pb.redirectErrorStream and maybe remove in future MPlayerErrorStreamConsumer
-  public void play(final String mediaPath, final long startPosition) throws InterruptedException {
-    stop();
+  public void play(final String mediaPath, final long startPosition) {
     LOGGER.log(Level.INFO, mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
     playerState.setPosition(mapPosition(startPosition));
@@ -69,9 +78,11 @@ public class MPlayer {
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
-      Thread stdOutThread = new Thread(stdOutConsumer);
-      stdOutThread.start();
+      if (playerEventsHandler != null) {
+        stdOutConsumer = new MPlayerOutputStreamConsumer(stdIn, playerState, playerEventsHandler);
+        Thread stdOutThread = new Thread(stdOutConsumer);
+        stdOutThread.start();
+      }
 
       errOutConsumer = new MPlayerErrorStreamConsumer(errIn);
       Thread errOutThread = new Thread(errOutConsumer);
@@ -88,7 +99,9 @@ public class MPlayer {
 
   public void stop() {
     if (isProcessAvailable()) {
-      stdOutConsumer.deactivate();
+      if (stdOutConsumer != null) {
+        stdOutConsumer.deactivate();
+      }
       errOutConsumer.deactivate();
       execute(COMMAND_QUIT);
       try {
@@ -115,6 +128,36 @@ public class MPlayer {
     return playerState.getDuration();
   }
 
+  public void increaseVolume() {
+    execute(COMMAND_INCREASE_VOLUME);
+  }
+
+  public void decreaseVolume() {
+    execute(COMMAND_DECREASE_VOLUME);
+  }
+
+  public int getVolumeInMillibels() {
+    return playerState.getVolumeInMillidels();
+  }
+
+  /**
+   * Sets the audio playback volume. Its effect will be clamped to the range [0.0, 1.0]
+   *
+   * @param volume the volume
+   */
+  public void setVolume(double volume) {
+    int millibels = 0;
+    if (volume >= 1.0) {
+      millibels = MAX_VOLUME_IN_MILLIBELS;
+    } else {
+      double realVolume = 1 - volume;
+      millibels = (int) ((MIN_VOLUME_IN_MILLIBELS * realVolume) + MAX_VOLUME_IN_MILLIBELS);
+    }
+
+    playerState.setVolume(millibels);
+    amixer.setVolume(millibels);
+  }
+
   private void execute(final String command) {
     LOGGER.log(Level.INFO, "execute: " + command);
     stdOut.print(command);
@@ -138,9 +181,7 @@ public class MPlayer {
     return process != null;
   }
 
-  private void printCommand(ArrayList<String> cmdCopy) {
-    final StringBuffer stringBuffer = new StringBuffer();
-    cmdCopy.stream().forEach(o -> stringBuffer.append(o).append(" "));
-    LOGGER.info("Executing command: " + stringBuffer.toString());
+  private void printCommand(final ArrayList<String> cmdCopy) {
+    LoggerUtil.printCommand(LOGGER, cmdCopy);
   }
 }

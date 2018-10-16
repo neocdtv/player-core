@@ -22,34 +22,34 @@ package io.neocdtv.player.core;
  */
 public class ModelUtil {
 
-    /**
-     * @param seconds The number of seconds to convert.
-     * @return A string representing hours, minutes, seconds, e.g. <code>11:23:44</code>
-     */
-    public static String toTimeString(long seconds) {
-        long hours = seconds / 3600,
-                remainder = seconds % 3600,
-                minutes = remainder / 60,
-                secs = remainder % 60;
+  /**
+   * @param seconds The number of seconds to convert.
+   * @return A string representing hours, minutes, seconds, e.g. <code>11:23:44</code>
+   */
+  public static String toTimeString(long seconds) {
+    long hours = seconds / 3600,
+        remainder = seconds % 3600,
+        minutes = remainder / 60,
+        secs = remainder % 60;
 
-        return ((hours < 10 ? "0" : "") + hours
-                + ":" + (minutes < 10 ? "0" : "") + minutes
-                + ":" + (secs < 10 ? "0" : "") + secs);
-    }
+    return ((hours < 10 ? "0" : "") + hours
+        + ":" + (minutes < 10 ? "0" : "") + minutes
+        + ":" + (secs < 10 ? "0" : "") + secs);
+  }
 
-    /**
-     * @param s A string representing hours, minutes, seconds, e.g. <code>11:23:44</code>
-     * @return The converted number of seconds.
-     */
-    public static long fromTimeString(String s) {
-        // Handle "00:00:00.000" pattern, drop the milliseconds
-        if (s.lastIndexOf(".") != -1)
-            s = s.substring(0, s.lastIndexOf("."));
-        String[] split = s.split(":");
-        if (split.length != 3)
-            throw new IllegalArgumentException("Can't parse time string: " + s);
-        return (Long.parseLong(split[0]) * 3600) +
-            (Long.parseLong(split[1]) * 60) +
-            (Long.parseLong(split[2]));
-    }
+  /**
+   * @param s A string representing hours, minutes, seconds, e.g. <code>11:23:44</code>
+   * @return The converted number of seconds.
+   */
+  public static long fromTimeString(String s) {
+    // Handle "00:00:00.000" pattern, drop the milliseconds
+    if (s.lastIndexOf(".") != -1)
+      s = s.substring(0, s.lastIndexOf("."));
+    String[] split = s.split(":");
+    if (split.length != 3)
+      throw new IllegalArgumentException("Can't parse time string: " + s);
+    return (Long.parseLong(split[0]) * 3600) +
+        (Long.parseLong(split[1]) * 60) +
+        (Long.parseLong(split[2]));
+  }
 }

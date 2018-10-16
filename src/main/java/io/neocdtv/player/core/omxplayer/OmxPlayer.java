@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.omxplayer;
 
+import io.neocdtv.player.core.LoggerUtil;
 import io.neocdtv.player.core.ModelUtil;
 import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
@@ -28,13 +29,13 @@ public class OmxPlayer {
   private PrintStream stdOut;
   private PlayerState playerState;
   private int volume = -3000;
-  private final PlayerEventsHandler playerEventsHandler;
+  private PlayerEventsHandler playerEventsHandler;
   private static final String OPTION_ADJUST_FRAME_RATE = "-r";
   private static final String OPTION_BLACK_BACKGROUND = "-b";
   private static final String OPTION_PRINT_STATS = "-s";
   private static final String OPTION_PRINT_INFORMATION = "-I";
   private static final String OPTION_START_POSITION = "-l";
-  private static final String OPTION_INITIAL_VOLUME= "--vol";
+  private static final String OPTION_INITIAL_VOLUME = "--vol";
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String COMMAND_INCREASE_VOLUME = "+";
@@ -49,9 +50,12 @@ public class OmxPlayer {
       OPTION_PRINT_STATS,
       OPTION_START_POSITION);
 
-  public OmxPlayer(final PlayerEventsHandler playerEventsHandler) {
+  public OmxPlayer() {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
+  }
+
+  public void addPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
     this.playerEventsHandler = playerEventsHandler;
   }
 
@@ -80,9 +84,11 @@ public class OmxPlayer {
       InputStream errIn = process.getErrorStream();
       stdOut = new PrintStream(process.getOutputStream());
 
-      stdOutConsumer = new OmxPlayerOutputStreamConsumer(stdIn, playerEventsHandler);
-      Thread one = new Thread(stdOutConsumer);
-      one.start();
+      if (playerEventsHandler != null) {
+        stdOutConsumer = new OmxPlayerOutputStreamConsumer(stdIn, playerEventsHandler);
+        Thread stdOutThread = new Thread(stdOutConsumer);
+        stdOutThread.start();
+      }
 
       errOutConsumer = new OmxPlayerErrorStreamConsumer(errIn);
       Thread two = new Thread(errOutConsumer);
@@ -95,7 +101,9 @@ public class OmxPlayer {
 
   public void stop() {
     if (isProcessAvailable()) {
-      stdOutConsumer.deactivate();
+      if (stdOutConsumer != null) {
+        stdOutConsumer.deactivate();
+      }
       errOutConsumer.deactivate();
       execute(COMMAND_QUIT);
       try {
@@ -131,7 +139,7 @@ public class OmxPlayer {
   }
 
   public void increaseVolume() {
-    if(volume < MAX_VOLUME_IN_MILLIBELS) {
+    if (volume < MAX_VOLUME_IN_MILLIBELS) {
       execute(COMMAND_INCREASE_VOLUME);
       volume += 300;
       playerState.setVolume(volume);
@@ -139,7 +147,7 @@ public class OmxPlayer {
   }
 
   public void decreaseVolume() {
-    if(volume > MIN_VOLUME_IN_MILLIBELS) {
+    if (volume > MIN_VOLUME_IN_MILLIBELS) {
       execute(COMMAND_DECREASE_VOLUME);
       volume -= 300;
       playerState.setVolume(volume);
@@ -170,8 +178,6 @@ public class OmxPlayer {
   }
 
   private void printCommand(final ArrayList<String> cmdCopy) {
-    final StringBuffer stringBuffer = new StringBuffer();
-    cmdCopy.stream().forEach(o -> stringBuffer.append(o).append(" "));
-    LOGGER.info("Executing command: " + stringBuffer.toString());
+    LoggerUtil.printCommand(LOGGER, cmdCopy);
   }
 }
