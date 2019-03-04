@@ -9,7 +9,7 @@ Maven
     <dependency>
       <groupId>io.neocdtv</groupId>
       <artifactId>player-core</artifactId>
-      <version>0.4</version>
+      <version>0.7</version>
     </dependency>
     
 Ubuntu/Debian
