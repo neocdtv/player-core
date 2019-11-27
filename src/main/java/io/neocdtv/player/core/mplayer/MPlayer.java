@@ -62,6 +62,7 @@ public class MPlayer {
 
   // TODO: check out pb.redirectErrorStream and maybe remove in future MPlayerErrorStreamConsumer
   public void play(final String mediaPath, final long startPosition) {
+    stop();
     LOGGER.log(Level.INFO, mediaPath + ", startPosition: " + startPosition);
     playerState = new PlayerState();
     playerState.setPosition(mapPosition(startPosition));
