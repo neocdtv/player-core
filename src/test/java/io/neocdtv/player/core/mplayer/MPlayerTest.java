@@ -1,5 +1,6 @@
 package io.neocdtv.player.core.mplayer;
 
+import io.neocdtv.player.core.Player;
 import io.neocdtv.player.core.PlayerEventsHandlerForTests;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,11 +24,12 @@ public class MPlayerTest {
   private static final Logger LOGGER = Logger.getLogger(MPlayerTest.class.getName());
   private static final int MILLIS = 250;
   private PlayerEventsHandlerForTests eventsHandler = spy(new PlayerEventsHandlerForTests());
-  private MPlayer mplayer = new MPlayer(new Amixer("mono"));
+  private Player mplayer = new MPlayer();
 
   @Before
   public void setup() {
-    mplayer.addPlayerEvent(eventsHandler);
+    mplayer.setAmixer(new Amixer("mono"));
+    mplayer.setPlayerEvent(eventsHandler);
   }
 
   @Test

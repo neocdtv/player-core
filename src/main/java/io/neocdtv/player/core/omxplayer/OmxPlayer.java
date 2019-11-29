@@ -2,8 +2,10 @@ package io.neocdtv.player.core.omxplayer;
 
 import io.neocdtv.player.core.LoggerUtil;
 import io.neocdtv.player.core.ModelUtil;
+import io.neocdtv.player.core.Player;
 import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
+import io.neocdtv.player.core.mplayer.Amixer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +22,7 @@ import java.util.logging.Logger;
  * @author xix
  * @since 03.01.18
  */
-public class OmxPlayer {
+public class OmxPlayer implements Player {
 
   private final static Logger LOGGER = Logger.getLogger(OmxPlayer.class.getName());
   private Process process = null;
@@ -55,8 +57,12 @@ public class OmxPlayer {
     playerState = new PlayerState();
   }
 
-  public void addPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
+  public void setPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
     this.playerEventsHandler = playerEventsHandler;
+  }
+
+  public void setAmixer(Amixer amixer) {
+    // dummy to make to interface work, TODO: switch to alsa with omxplayer
   }
 
   public void play(final String mediaPath) {
@@ -132,6 +138,11 @@ public class OmxPlayer {
 
   public int getVolumeInMillibels() {
     return playerState.getVolumeInMillidels();
+  }
+
+  @Override
+  public void setVolume(double volume) {
+    throw new RuntimeException("NOT IMPLEMENTED");
   }
 
   public float getPositionPercentage() {

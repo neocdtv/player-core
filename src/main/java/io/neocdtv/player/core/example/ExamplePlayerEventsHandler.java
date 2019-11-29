@@ -1,6 +1,6 @@
-package io.neocdtv.player.core;
+package io.neocdtv.player.core.example;
 
-import io.neocdtv.player.core.omxplayer.OmxPlayer;
+import io.neocdtv.player.core.PlayerEventsHandler;
 
 import java.util.logging.Logger;
 
@@ -10,9 +10,9 @@ import java.util.logging.Logger;
  * @author xix
  * @since 25.02.18
  */
-public class SimplePlayerEventsHandler implements PlayerEventsHandler {
+public class ExamplePlayerEventsHandler implements PlayerEventsHandler {
 
-  private final static Logger LOGGER = Logger.getLogger(SimplePlayerEventsHandler.class.getName());
+  private final static Logger LOGGER = Logger.getLogger(ExamplePlayerEventsHandler.class.getName());
 
 
   @Override

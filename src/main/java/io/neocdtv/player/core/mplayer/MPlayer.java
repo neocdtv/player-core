@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * @author xix
  * @since 03.01.18
  */
-public class MPlayer {
+public class MPlayer implements io.neocdtv.player.core.Player {
 
   private final static Logger LOGGER = Logger.getLogger(MPlayer.class.getName());
   private Process process = null;
@@ -28,6 +28,7 @@ public class MPlayer {
   private MPlayerErrorStreamConsumer errOutConsumer;
   private PrintStream stdOut;
   private PlayerState playerState;
+  private Amixer amixer;
   private PlayerEventsHandler playerEventsHandler;
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
@@ -43,24 +44,30 @@ public class MPlayer {
       "mplayer",
       OPTION_MEDIA_INFO,
       OPTION_START_POSITION);
-  private final Amixer amixer;
 
-  public MPlayer(final Amixer amixer) {
+  public MPlayer() {
     Runtime.getRuntime().addShutdownHook(cleanupThread);
     playerState = new PlayerState();
-    this.amixer = amixer;
   }
 
+  @Override
   public void play(final String mediaPath) {
     LOGGER.log(Level.INFO, mediaPath);
     play(mediaPath, 0);
   }
 
-  public void addPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
+  @Override
+  public void setPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
     this.playerEventsHandler = playerEventsHandler;
   }
 
+  @Override
+  public void setAmixer(Amixer amixer) {
+    this.amixer = amixer;
+  }
+
   // TODO: check out pb.redirectErrorStream and maybe remove in future MPlayerErrorStreamConsumer
+  @Override
   public void play(final String mediaPath, final long startPosition) {
     stop();
     LOGGER.log(Level.INFO, mediaPath + ", startPosition: " + startPosition);
@@ -98,6 +105,7 @@ public class MPlayer {
     return startPosition + ".0";
   }
 
+  @Override
   public void stop() {
     if (isProcessAvailable()) {
       if (stdOutConsumer != null) {
@@ -113,30 +121,37 @@ public class MPlayer {
     }
   }
 
+  @Override
   public void pause() {
     execute(COMMAND_PAUSE);
   }
 
+  @Override
   public void skip(long seconds) throws InterruptedException {
     play(playerState.getCurrentUri(), seconds);
   }
 
+  @Override
   public long getPosition() {
     return playerState.getPosition();
   }
 
+  @Override
   public long getDuration() {
     return playerState.getDuration();
   }
 
+  @Override
   public void increaseVolume() {
     execute(COMMAND_INCREASE_VOLUME);
   }
 
+  @Override
   public void decreaseVolume() {
     execute(COMMAND_DECREASE_VOLUME);
   }
 
+  @Override
   public int getVolumeInMillibels() {
     return playerState.getVolumeInMillidels();
   }
@@ -146,6 +161,7 @@ public class MPlayer {
    *
    * @param volume the volume
    */
+  @Override
   public void setVolume(double volume) {
     int millibels = 0;
     if (volume >= 1.0) {
@@ -156,7 +172,9 @@ public class MPlayer {
     }
 
     playerState.setVolume(millibels);
-    amixer.setVolume(millibels);
+    if (amixer != null) {
+      amixer.setVolume(millibels);
+    }
   }
 
   private void execute(final String command) {
@@ -174,6 +192,7 @@ public class MPlayer {
     }
   }
 
+  @Override
   public PlayerState getPlayerState() {
     return playerState;
   }
