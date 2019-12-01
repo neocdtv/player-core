@@ -37,6 +37,7 @@ public class OmxPlayer implements Player {
   private static final String OPTION_PRINT_STATS = "-s";
   private static final String OPTION_PRINT_INFORMATION = "-I";
   private static final String OPTION_START_POSITION = "-l";
+  private static final String OPTION_LIVE = "--live";
   private static final String OPTION_INITIAL_VOLUME = "--vol";
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
@@ -48,6 +49,7 @@ public class OmxPlayer implements Player {
       "omxplayer",
       OPTION_PRINT_INFORMATION,
       OPTION_ADJUST_FRAME_RATE,
+      OPTION_LIVE,
       OPTION_BLACK_BACKGROUND,
       OPTION_PRINT_STATS,
       OPTION_START_POSITION);
