@@ -1,5 +1,6 @@
 ## raspberry pi 3;Creative Sound Blaster X-Fi HD USB Audio System
 ### list alsa devices
+```sh
 $ aplay -l
 **** List of PLAYBACK Hardware Devices ****
 card 0: ALSA [bcm2835 ALSA], device 0: bcm2835 ALSA [bcm2835 ALSA]
@@ -26,11 +27,14 @@ card 1: HD [USB Sound Blaster HD], device 1: USB Audio [USB Audio #1]
 card 1: HD [USB Sound Blaster HD], device 2: USB Audio [USB Audio #2]
   Subdevices: 1/1
   Subdevice #0: subdevice #0
-
+```
 ### use alsa device X-Fi HD USB and analog/chinch output;1.0
+```sh
 $ mplayer -novideo -ao alsa:device=hw=1.0 video.mp4
 $ omxplayer -o alsa:hw:1,0 video.mp4
-
+```
 ### use alsa device X-Fi HD USB and digital/spdif output:1.1 also 1.2 can be used not sure about the difference
+```sh
 $ mplayer -novideo -ao alsa:device=hw=1.1 video.mp4
 $ omxplayer -o alsa:hw:1,1 video.mp4
+```
