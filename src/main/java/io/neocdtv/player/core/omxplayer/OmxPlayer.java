@@ -32,6 +32,7 @@ public class OmxPlayer implements Player {
   private PlayerState playerState;
   private int volume = -3000;
   private PlayerEventsHandler playerEventsHandler;
+  private List<String> additionalParameters = new ArrayList<>();
   private static final String OPTION_ADJUST_FRAME_RATE = "-r";
   private static final String OPTION_BLACK_BACKGROUND = "-b";
   private static final String OPTION_PRINT_STATS = "-s";
@@ -45,8 +46,7 @@ public class OmxPlayer implements Player {
   private static final String COMMAND_DECREASE_VOLUME = "-";
   private static final int MAX_VOLUME_IN_MILLIBELS = 600;
   private static final int MIN_VOLUME_IN_MILLIBELS = -6000;
-  private final static List<String> CMD = Arrays.asList(
-      "omxplayer",
+  private static List<String> PLAYER_PARAMS = Arrays.asList(
       OPTION_PRINT_INFORMATION,
       OPTION_ADJUST_FRAME_RATE,
       OPTION_LIVE,
@@ -59,7 +59,7 @@ public class OmxPlayer implements Player {
     playerState = new PlayerState();
   }
 
-  public void setPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
+  public void setPlayerEventHandler(final PlayerEventsHandler playerEventsHandler) {
     this.playerEventsHandler = playerEventsHandler;
   }
 
@@ -78,14 +78,16 @@ public class OmxPlayer implements Player {
     playerState = new PlayerState();
     playerState.setCurrentUri(mediaPath);
     playerState.setVolume(volume);
-    ArrayList<String> cmdCopy = new ArrayList<>(CMD);
-    cmdCopy.add(ModelUtil.toTimeString(startPosition));
-    cmdCopy.add(OPTION_INITIAL_VOLUME);
-    cmdCopy.add(String.valueOf(volume));
-    cmdCopy.add(mediaPath);
+    List<String> cmd = new ArrayList<>(Arrays.asList(getPlayerCommand()));
+    cmd.addAll(additionalParameters);
+    cmd.addAll(PLAYER_PARAMS);
+    cmd.add(ModelUtil.toTimeString(startPosition));
+    cmd.add(OPTION_INITIAL_VOLUME);
+    cmd.add(String.valueOf(volume));
+    cmd.add(mediaPath);
 
-    printCommand(cmdCopy);
-    ProcessBuilder processBuilder = new ProcessBuilder(cmdCopy);
+    printCommand(cmd);
+    ProcessBuilder processBuilder = new ProcessBuilder(cmd);
     try {
       process = processBuilder.start();
       InputStream stdIn = process.getInputStream();
@@ -99,8 +101,8 @@ public class OmxPlayer implements Player {
       }
 
       errOutConsumer = new OmxPlayerErrorStreamConsumer(errIn);
-      Thread two = new Thread(errOutConsumer);
-      two.start();
+      Thread errOutThread = new Thread(errOutConsumer);
+      errOutThread.start();
 
     } catch (IOException ioException) {
       LOGGER.log(Level.SEVERE, ioException.getMessage(), ioException);
@@ -182,6 +184,14 @@ public class OmxPlayer implements Player {
     }
   }
 
+  public String getPlayerCommand() {
+    return "omxplayer";
+  }
+
+  public void setAdditionalParameters(List<String> additionalParameters) {
+    this.additionalParameters = additionalParameters;
+  }
+
   public PlayerState getPlayerState() {
     return playerState;
   }
@@ -190,7 +200,7 @@ public class OmxPlayer implements Player {
     return process != null;
   }
 
-  private void printCommand(final ArrayList<String> cmdCopy) {
+  private void printCommand(final List<String> cmdCopy) {
     LoggerUtil.printCommand(LOGGER, cmdCopy);
   }
 }

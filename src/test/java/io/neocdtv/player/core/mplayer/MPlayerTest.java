@@ -29,7 +29,7 @@ public class MPlayerTest {
   @Before
   public void setup() {
     mplayer.setAmixer(new Amixer("mono"));
-    mplayer.setPlayerEvent(eventsHandler);
+    mplayer.setPlayerEventHandler(eventsHandler);
   }
 
   @Test

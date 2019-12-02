@@ -2,6 +2,7 @@ package io.neocdtv.player.core.mplayer;
 
 import io.neocdtv.player.core.LoggerUtil;
 import io.neocdtv.player.core.MediaInfo;
+import io.neocdtv.player.core.Player;
 import io.neocdtv.player.core.PlayerEventsHandler;
 import io.neocdtv.player.core.PlayerState;
 
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
  * @author xix
  * @since 03.01.18
  */
-public class MPlayer implements io.neocdtv.player.core.Player {
+public class MPlayer implements Player {
 
   private final static Logger LOGGER = Logger.getLogger(MPlayer.class.getName());
   private Process process = null;
@@ -30,9 +31,11 @@ public class MPlayer implements io.neocdtv.player.core.Player {
   private PlayerState playerState;
   private Amixer amixer;
   private PlayerEventsHandler playerEventsHandler;
+  private List<String> additionalParameters = new ArrayList<>();
   private static final String COMMAND_PAUSE = "p";
   private static final String COMMAND_QUIT = "q";
   private static final String OPTION_MEDIA_INFO = "-identify";
+  private static final String COMMAND_FULLSCREEN = "-fs";
   private static final String COMMAND_INCREASE_VOLUME = "0";
   private static final String COMMAND_DECREASE_VOLUME = "9";
   private static final String OPTION_NO_VIDEO = "-novideo";
@@ -40,9 +43,9 @@ public class MPlayer implements io.neocdtv.player.core.Player {
   private static final String OPTION_START_POSITION = "-ss";
   private static final int MAX_VOLUME_IN_MILLIBELS = 400;
   private static final int MIN_VOLUME_IN_MILLIBELS = -9600;
-  private final static List<String> CMD = Arrays.asList(
-      "mplayer",
+  private final static List<String> PLAYER_PARAMS = Arrays.asList(
       OPTION_MEDIA_INFO,
+      COMMAND_FULLSCREEN,
       OPTION_START_POSITION);
 
   public MPlayer() {
@@ -57,7 +60,7 @@ public class MPlayer implements io.neocdtv.player.core.Player {
   }
 
   @Override
-  public void setPlayerEvent(final PlayerEventsHandler playerEventsHandler) {
+  public void setPlayerEventHandler(final PlayerEventsHandler playerEventsHandler) {
     this.playerEventsHandler = playerEventsHandler;
   }
 
@@ -75,11 +78,13 @@ public class MPlayer implements io.neocdtv.player.core.Player {
     playerState.setPosition(mapPosition(startPosition));
     playerState.setCurrentUri(mediaPath);
     playerState.setDuration(MediaInfo.getDuration(mediaPath));
-    ArrayList<String> cmdCopy = new ArrayList<>(CMD);
-    cmdCopy.add(startPosition + "");
-    cmdCopy.add(mediaPath);
-    printCommand(cmdCopy);
-    ProcessBuilder processBuilder = new ProcessBuilder(cmdCopy);
+    List<String> cmd = new ArrayList<>(Arrays.asList(getPlayerCommand()));
+    cmd.addAll(additionalParameters);
+    cmd.addAll(PLAYER_PARAMS);
+    cmd.add(startPosition + "");
+    cmd.add(mediaPath);
+    printCommand(cmd);
+    ProcessBuilder processBuilder = new ProcessBuilder(cmd);
     try {
       process = processBuilder.start();
       InputStream stdIn = process.getInputStream();
@@ -185,6 +190,16 @@ public class MPlayer implements io.neocdtv.player.core.Player {
 
   private Thread cleanupThread = new Thread(this::cleanup);
 
+  @Override
+  public String getPlayerCommand() {
+    return "mplayer";
+  }
+
+  @Override
+  public void setAdditionalParameters(List<String> additionalParameters) {
+    this.additionalParameters = additionalParameters;
+  }
+
   private void cleanup() {
     LOGGER.log(Level.INFO, "clean up");
     if (isProcessAvailable()) {
@@ -201,7 +216,7 @@ public class MPlayer implements io.neocdtv.player.core.Player {
     return process != null;
   }
 
-  private void printCommand(final ArrayList<String> cmdCopy) {
-    LoggerUtil.printCommand(LOGGER, cmdCopy);
+  private void printCommand(final List<String> cmd) {
+    LoggerUtil.printCommand(LOGGER, cmd);
   }
 }
