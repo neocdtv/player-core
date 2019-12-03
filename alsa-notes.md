@@ -32,9 +32,11 @@ card 1: HD [USB Sound Blaster HD], device 2: USB Audio [USB Audio #2]
 ```sh
 $ mplayer -novideo -ao alsa:device=hw=1.0 video.mp4
 $ omxplayer -o alsa:hw:1,0 video.mp4
+$ cvlc --aout=alsa --alsa-audio-device=plughw:1,0
 ```
 ### use alsa device X-Fi HD USB and digital/spdif output:1.1 also 1.2 can be used not sure about the difference
 ```sh
 $ mplayer -novideo -ao alsa:device=hw=1.1 video.mp4
 $ omxplayer -o alsa:hw:1,1 video.mp4
+$ cvlc --aout=alsa --alsa-audio-device=plughw:1,1
 ```
